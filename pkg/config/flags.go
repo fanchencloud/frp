@@ -27,11 +27,26 @@ import (
 	"github.com/fatedier/frp/pkg/config/v1/validation"
 )
 
-// WordSepNormalizeFunc changes all flags that contain "_" separators
+// WordSepNormalizeFunc 用于标准化标志名称。
+// 它将所有包含 "_" 分隔符的标志名称转换为使用 "-"。
+// 这样做是为了确保标志名称的一致性，使其更加规范且易于管理。
+//
+// 参数:
+//
+//	f *pflag.FlagSet: 应用规范化规则的标志集。
+//	name string: 原始标志名称，可能包含 "_" 分隔符。
+//
+// 返回值:
+//
+//	pflag.NormalizedName: 标准化的标志名称，将 "_" 替换为 "-"。
+//	                      如果原始名称中不包含 "_"，则返回原始名称不变。
 func WordSepNormalizeFunc(f *pflag.FlagSet, name string) pflag.NormalizedName {
+	// 检查标志名称是否包含 "_"
 	if strings.Contains(name, "_") {
+		// 如果包含 "_"，将所有 "_" 替换为 "-"
 		return pflag.NormalizedName(strings.ReplaceAll(name, "_", "-"))
 	}
+	// 如果不包含 "_"，无需处理，返回原始名称
 	return pflag.NormalizedName(name)
 }
 
