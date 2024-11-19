@@ -36,10 +36,16 @@ import (
 	"github.com/fatedier/frp/pkg/util/util"
 )
 
+// glbEnvs 是一个 map 类型的全局变量
+// key 为字符串类型,存储环境变量的名称
+// value 也为字符串类型,存储环境变量的值
 var glbEnvs map[string]string
 
+// 加载并解析保存环境变量
 func init() {
 	glbEnvs = make(map[string]string)
+	// os.Environ() 返回当前进程的环境变量列表
+	// 返回格式为 ["key=value", "key=value", ...] 的字符串切片
 	envs := os.Environ()
 	for _, env := range envs {
 		pair := strings.SplitN(env, "=", 2)
@@ -50,16 +56,34 @@ func init() {
 	}
 }
 
+// Values 结构体用于存储配置文件中可能用到的变量值
+// 目前只包含环境变量信息,存储在 Envs 字段中
+// Envs 是一个 map 类型,key 和 value 都是字符串
+// 主要用于配置文件的模板渲染功能
 type Values struct {
-	Envs map[string]string // environment vars
+	Envs map[string]string // 存储环境变量,key 是环境变量名,value 是环境变量值
 }
 
+// GetValues 函数返回一个指向 Values 结构体的指针
+// 该结构体包含当前进程的环境变量信息
 func GetValues() *Values {
 	return &Values{
 		Envs: glbEnvs,
 	}
 }
 
+// DetectLegacyINIFormat 函数用于检测配置文件内容是否为旧版本的 INI 格式
+// 参数:
+//   - content []byte: 配置文件的字节内容
+//
+// 返回值:
+//   - bool: 如果是旧版本 INI 格式返回 true,否则返回 false
+//
+// 检测逻辑:
+//  1. 尝试使用 ini 包加载配置内容
+//  2. 如果加载失败,说明不是 INI 格式,返回 false
+//  3. 如果能成功获取 [common] 配置段,说明是旧版本格式,返回 true
+//  4. 其他情况返回 false
 func DetectLegacyINIFormat(content []byte) bool {
 	f, err := ini.Load(content)
 	if err != nil {

@@ -37,6 +37,18 @@ var (
 	serverCfg v1.ServerConfig
 )
 
+// init() 方法是 Go 语言的一个特殊函数，它具有以下特点：
+// 执行时机：
+//
+//	在程序启动时自动执行
+//	在 main() 函数执行之前执行
+//	在包级别变量初始化之后执行
+//
+// 执行顺序：
+//
+//	首先执行导入包的 init() 函数
+//	然后执行当前包的 init() 函数
+//	如果一个包被多个包同时导入，该包的 init() 只会执行一次
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file of frps")
 	rootCmd.PersistentFlags().BoolVarP(&showVersion, "version", "v", false, "version of frps")
@@ -54,10 +66,11 @@ var rootCmd = &cobra.Command{
 			return nil
 		}
 
+		// 分组定义变量
 		var (
-			svrCfg         *v1.ServerConfig
-			isLegacyFormat bool
-			err            error
+			svrCfg         *v1.ServerConfig // 定义一个指向 ServerConfig 类型的指针变量 svrCfg
+			isLegacyFormat bool             // 定义一个布尔变量 isLegacyFormat
+			err            error            // 定义一个 error 类型的变量 err
 		)
 		if cfgFile != "" {
 			svrCfg, isLegacyFormat, err = config.LoadServerConfig(cfgFile, strictConfigMode)
@@ -91,6 +104,12 @@ var rootCmd = &cobra.Command{
 	},
 }
 
+// Execute 函数是 frps 程序的入口函数
+// 主要完成以下工作:
+//  1. 设置全局命令行参数标准化函数,用于统一处理命令行参数格式
+//     WordSepNormalizeFunc 会将参数中的 '-' 和 '_' 统一转换为 '-'
+//  2. 执行根命令 rootCmd
+//     如果执行过程中发生错误,程序会以状态码 1 退出
 func Execute() {
 	rootCmd.SetGlobalNormalizationFunc(config.WordSepNormalizeFunc)
 	if err := rootCmd.Execute(); err != nil {

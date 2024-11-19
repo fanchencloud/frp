@@ -30,10 +30,12 @@ const (
 	BandwidthLimitModeServer = "server"
 )
 
+// BandwidthQuantity 表示带宽量。
+// 该结构体用于以不同单位（如 MB 或 KB）表示带宽，同时内部存储的实际值为字节数。
 type BandwidthQuantity struct {
-	s string // MB or KB
+	s string // 带宽数量的单位，例如 "MB" 或 "KB"
 
-	i int64 // bytes
+	i int64 // 带宽数量的实际值，以字节为单位
 }
 
 func NewBandwidthQuantity(s string) (BandwidthQuantity, error) {
